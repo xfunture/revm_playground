@@ -151,6 +151,7 @@ pub async fn mempool_watching(target_address:String) -> Result<()> {
     //Step #2 Stream data asynchronously
     let (event_sender,_) : (Sender<Event>,_) = broadcast::channel(512);
 
+
     let mut set = JoinSet::new();
 
     // Stream new headers
