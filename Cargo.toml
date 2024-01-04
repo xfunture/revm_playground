@@ -32,10 +32,17 @@ fern = {version = "0.6.2", features = ["colored"]}
 chrono = "0.4.23"
 colored = "2.0.0"
 
-# github
+# cfmms 
 cfmms = { git = "https://github.com/0xKitsune/cfmms-rs.git" }
 
 
 #json
 serde_json = "1.0.109"
 serde = "1.0.193"
+
+#redis
+mini-redis = "0.4"
+
+[[example]]
+name = "hello-redis"
+path = "examples/hello-redis.rs"
