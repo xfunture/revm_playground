@@ -46,7 +46,7 @@ async fn trace_state_diff(
     target_address:String,
 ) -> Result<()>{
     info!(
-        "Tx #{} received.Checking if it touches:{}",
+        "Tx {} received.Checking if it touches:{}",
         tx.hash,
         target_address
     );
@@ -215,37 +215,39 @@ pub async fn mempool_watching(target_address:String) -> Result<()> {
             loop {
                 match event_receiver.recv().await{
                     Ok(event) => match event{
-                        Event::NewBlock(block) =>{
-                            new_block = block;
-                            info!("{:?}",new_block);
-                        }
-                        Event::Transaction(tx) => {
-                            if new_block.number != U64::zero(){
-                                let next_base_fee = calculate_next_block_base_fee(
-                                    new_block.gas_used,
-                                    new_block.gas_limit,
-                                    new_block.base_fee_per_gas,
-                                );
-                                //max_fee_per_gas has to be greater than next block's base fee
-                                if tx.max_fee_per_gas.unwrap_or_default() > U256::from(next_base_fee)
-                                {
-                                    //we haven't defined trace_state_diff yet,we will
-                                    // so this will error at this point
-                                    match trace_state_diff(
-                                        provider.clone(),
-                                        &tx,
-                                        new_block.number,
-                                        &pools,
-                                        target_address.clone(),
-                                    ).await{
-                                        Ok(_) => {}
-                                        Err(_) => {}
-                                    }
-                                }
-                            }
-                        }
+                                        Event::NewBlock(block) =>{
+                                                                    new_block = block;
+                                                                    info!("{:?}",new_block);
+                                                                }
+                                        Event::Transaction(tx) => {
+                                            if new_block.number != U64::zero(){
+                                                let next_base_fee = calculate_next_block_base_fee(
+                                                    new_block.gas_used,
+                                                    new_block.gas_limit,
+                                                    new_block.base_fee_per_gas,
+                                                );
+                                                //max_fee_per_gas has to be greater than next block's base fee
+                                                if tx.max_fee_per_gas.unwrap_or_default() > U256::from(next_base_fee)
+                                                {
+                                                    //we haven't defined trace_state_diff yet,we will
+                                                    // so this will error at this point
+                                                    match trace_state_diff(
+                                                        provider.clone(),
+                                                        &tx,
+                                                        new_block.number,
+                                                        &pools,
+                                                        target_address.clone(),
+                                                    ).await{
+                                                        Ok(_) => {}
+                                                        Err(_) => {}
+                                                    }
+                                                }
+                                            }
+                                        }
                     },
-                    Err(_) => {}
+                    Err(_) => {
+                        // println!("event_receiver error\n");
+                    }
                 }
             }
         });
